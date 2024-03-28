@@ -49,7 +49,7 @@ param(
 
 Begin {
     # ConfigMgr Client Health Version
-    $Version = '2.0.0'
+    $Version = '3.0.0'
     $PowerShellVersion = [int]$PSVersionTable.PSVersion.Major
     $global:ScriptPath = split-path -parent $MyInvocation.MyCommand.Definition
 
@@ -2973,6 +2973,7 @@ Begin {
 		$ClientSettings = $null
 
         $obj = [pscustomobject]@{
+            clientHealthId = ([guid]::Empty).Guid.ToString()
             Hostname = $Hostname
             Operatingsystem = $OperatingSystem
             Architecture = $Architecture
@@ -3108,15 +3109,15 @@ Begin {
 
 		#ADD ClientSettings.log...
         $query= "begin tran
-        if exists (SELECT * FROM $table WITH (updlock,serializable) WHERE Hostname='"+$log.Hostname+"')
+        if exists (SELECT * FROM $table WITH (updlock,serializable) WHERE ClientHealthId='"+$log.clientHealthId+"')
         begin
-            UPDATE $table SET Operatingsystem='"+$log.Operatingsystem+"', Architecture='"+$log.Architecture+"', Build='"+$log.Build+"', Manufacturer='"+$log.Manufacturer+"', Model='"+$log.Model+"', InstallDate='"+$log.InstallDate+"', $q1 LastLoggedOnUser='"+$log.LastLoggedOnUser+"', ClientVersion='"+$log.ClientVersion+"', PSVersion='"+$log.PSVersion+"', PSBuild='"+$log.PSBuild+"', Sitecode='"+$log.Sitecode+"', Domain='"+$log.Domain+"', MaxLogSize='"+$log.MaxLogSize+"', MaxLogHistory='"+$log.MaxLogHistory+"', CacheSize='"+$log.CacheSize+"', ClientCertificate='"+$log.ClientCertificate+"', ProvisioningMode='"+$log.ProvisioningMode+"', DNS='"+$log.DNS+"', Drivers='"+$log.Drivers+"', Updates='"+$log.Updates+"', PendingReboot='"+$log.PendingReboot+"', LastBootTime='"+$log.LastBootTime+"', OSDiskFreeSpace='"+$log.OSDiskFreeSpace+"', Services='"+$log.Services+"', AdminShare='"+$log.AdminShare+"', StateMessages='"+$log.StateMessages+"', WUAHandler='"+$log.WUAHandler+"', WMI='"+$log.WMI+"', RefreshComplianceState='"+$log.RefreshComplianceState+"', HWInventory='"+$log.HWInventory+"', Version='"+$Version+"', $q10 Timestamp='"+$smallDateTime+"', SWMetering='"+$log.SWMetering+"', BITS='"+$log.BITS+"', PatchLevel='"+$Log.PatchLevel+"', ClientInstalledReason='"+$log.ClientInstalledReason+"'
-            WHERE Hostname = '"+$log.Hostname+"'
+            UPDATE $table SET Hostname = '"+$log.Hostname+"', Operatingsystem='"+$log.Operatingsystem+"', Architecture='"+$log.Architecture+"', Build='"+$log.Build+"', Manufacturer='"+$log.Manufacturer+"', Model='"+$log.Model+"', InstallDate='"+$log.InstallDate+"', $q1 LastLoggedOnUser='"+$log.LastLoggedOnUser+"', ClientVersion='"+$log.ClientVersion+"', PSVersion='"+$log.PSVersion+"', PSBuild='"+$log.PSBuild+"', Sitecode='"+$log.Sitecode+"', Domain='"+$log.Domain+"', MaxLogSize='"+$log.MaxLogSize+"', MaxLogHistory='"+$log.MaxLogHistory+"', CacheSize='"+$log.CacheSize+"', ClientCertificate='"+$log.ClientCertificate+"', ProvisioningMode='"+$log.ProvisioningMode+"', DNS='"+$log.DNS+"', Drivers='"+$log.Drivers+"', Updates='"+$log.Updates+"', PendingReboot='"+$log.PendingReboot+"', LastBootTime='"+$log.LastBootTime+"', OSDiskFreeSpace='"+$log.OSDiskFreeSpace+"', Services='"+$log.Services+"', AdminShare='"+$log.AdminShare+"', StateMessages='"+$log.StateMessages+"', WUAHandler='"+$log.WUAHandler+"', WMI='"+$log.WMI+"', RefreshComplianceState='"+$log.RefreshComplianceState+"', HWInventory='"+$log.HWInventory+"', Version='"+$Version+"', $q10 Timestamp='"+$smallDateTime+"', SWMetering='"+$log.SWMetering+"', BITS='"+$log.BITS+"', PatchLevel='"+$Log.PatchLevel+"', ClientInstalledReason='"+$log.ClientInstalledReason+"'
+            WHERE ClientHealthId = '"+$log.clientHealthId+"'
         end
         else
         begin
-            INSERT INTO $table (Hostname, Operatingsystem, Architecture, Build, Manufacturer, Model, InstallDate, $q2 LastLoggedOnUser, ClientVersion, PSVersion, PSBuild, Sitecode, Domain, MaxLogSize, MaxLogHistory, CacheSize, ClientCertificate, ProvisioningMode, DNS, Drivers, Updates, PendingReboot, LastBootTime, OSDiskFreeSpace, Services, AdminShare, StateMessages, WUAHandler, WMI, RefreshComplianceState, HWInventory, Version, $q20 Timestamp, SWMetering, BITS, PatchLevel, ClientInstalledReason)
-            VALUES ('"+$log.Hostname+"', '"+$log.Operatingsystem+"', '"+$log.Architecture+"', '"+$log.Build+"', '"+$log.Manufacturer+"', '"+$log.Model+"', '"+$log.InstallDate+"', $q3 '"+$log.LastLoggedOnUser+"', '"+$log.ClientVersion+"', '"+$log.PSVersion+"', '"+$log.PSBuild+"', '"+$log.Sitecode+"', '"+$log.Domain+"', '"+$log.MaxLogSize+"', '"+$log.MaxLogHistory+"', '"+$log.CacheSize+"', '"+$log.ClientCertificate+"', '"+$log.ProvisioningMode+"', '"+$log.DNS+"', '"+$log.Drivers+"', '"+$log.Updates+"', '"+$log.PendingReboot+"', '"+$log.LastBootTime+"', '"+$log.OSDiskFreeSpace+"', '"+$log.Services+"', '"+$log.AdminShare+"', '"+$log.StateMessages+"', '"+$log.WUAHandler+"', '"+$log.WMI+"', '"+$log.RefreshComplianceState+"', '"+$log.HWInventory+"', '"+$log.Version+"', $q30 '"+$smallDateTime+"', '"+$log.SWMetering+"', '"+$log.BITS+"', '"+$Log.PatchLevel+"', '"+$Log.ClientInstalledReason+"')
+            INSERT INTO $table (ClientHealthId, Hostname, Operatingsystem, Architecture, Build, Manufacturer, Model, InstallDate, $q2 LastLoggedOnUser, ClientVersion, PSVersion, PSBuild, Sitecode, Domain, MaxLogSize, MaxLogHistory, CacheSize, ClientCertificate, ProvisioningMode, DNS, Drivers, Updates, PendingReboot, LastBootTime, OSDiskFreeSpace, Services, AdminShare, StateMessages, WUAHandler, WMI, RefreshComplianceState, HWInventory, Version, $q20 Timestamp, SWMetering, BITS, PatchLevel, ClientInstalledReason)
+            VALUES ('"+$log.clientHealthId+"', '"+$log.Hostname+"', '"+$log.Operatingsystem+"', '"+$log.Architecture+"', '"+$log.Build+"', '"+$log.Manufacturer+"', '"+$log.Model+"', '"+$log.InstallDate+"', $q3 '"+$log.LastLoggedOnUser+"', '"+$log.ClientVersion+"', '"+$log.PSVersion+"', '"+$log.PSBuild+"', '"+$log.Sitecode+"', '"+$log.Domain+"', '"+$log.MaxLogSize+"', '"+$log.MaxLogHistory+"', '"+$log.CacheSize+"', '"+$log.ClientCertificate+"', '"+$log.ProvisioningMode+"', '"+$log.DNS+"', '"+$log.Drivers+"', '"+$log.Updates+"', '"+$log.PendingReboot+"', '"+$log.LastBootTime+"', '"+$log.OSDiskFreeSpace+"', '"+$log.Services+"', '"+$log.AdminShare+"', '"+$log.StateMessages+"', '"+$log.WUAHandler+"', '"+$log.WMI+"', '"+$log.RefreshComplianceState+"', '"+$log.HWInventory+"', '"+$log.Version+"', $q30 '"+$smallDateTime+"', '"+$log.SWMetering+"', '"+$log.BITS+"', '"+$Log.PatchLevel+"', '"+$Log.ClientInstalledReason+"')
         end
         commit tran"
 

@@ -13,6 +13,9 @@ $header = @{
 $json=Invoke-RestMethod -Method Get -Uri 'http://testdb/api/Clients/Client?name=6e1853d0-8d83-4c6e-89d0-e2ea2c829ad7' -Headers $header
 $json=Invoke-RestMethod -Method Get -Uri 'http://testdb/api/Clients/ClientConfiguration' -Headers $header
 
+$json=Invoke-RestMethod -Method Put -Uri 'http://testdb/api/Clients/Client' -Headers $header -Body $client -ContentType 'application/json'
+$json=Invoke-RestMethod -Method Put -Uri 'http://testdb/api/Clients/Client' -Headers $header -Body $NewClient -ContentType 'application/json'
+
 
 $json=Invoke-RestMethod -Method Get -Uri 'https://localhost:7107/api/Clients/ClientConfiguration' -Headers $header
 
@@ -344,7 +347,7 @@ $client = @'
 
 $NewClient = @'
 {
-    "hostname": "NewBob",
+    "hostname": "NewPhil",
     "operatingSystem": "Windows 2000 Professional",
     "architecture": "x86",
     "build": "sp2",
