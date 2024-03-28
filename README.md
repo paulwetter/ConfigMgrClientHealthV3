@@ -1,6 +1,6 @@
 # ConfigMgr Client Health
 
-Version: 0.8.3
+Version: 2.0.0
 
 This is the master branch of ConfigMgr Client Health and is ready for production.
 
