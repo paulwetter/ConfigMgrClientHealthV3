@@ -2,13 +2,12 @@
 .SYNOPSIS
     ConfigMgr Client Health is a tool that validates and automatically fixes errors on Windows computers managed by Microsoft Configuration Manager.
 .EXAMPLE
-   .\ConfigMgrClientHealth.ps1 -Config .\config.json
+   .\ConfigMgrClientHealth.ps1
+   The above example will read the config.json file located in the same directory as the script.
 .EXAMPLE
-    \\cm01.rodland.lab\ClientHealth$\ConfigMgrClientHealth.ps1 -Config \\cm01.rodland.lab\ClientHealth$\Config.json -Webservice https://cm01.rodland.lab/ConfigMgrClientHealth
+    \\cm01.domain.com\ClientHealth$\ConfigMgrClientHealth.ps1 -Config \\cm01.domain.com\ClientHealth$\Config.json
 .PARAMETER Config
     A single parameter specifying the path to the configuration json file.
-.PARAMETER Webservice
-    A single parameter specifying the URI to the ConfigMgr Client Health Webservice.
 .DESCRIPTION
     ConfigMgr Client Health detects and fixes following errors:
         * ConfigMgr client is not installed.
@@ -30,9 +29,12 @@
 .NOTES
     You should run this with at least local administrator rights. It is recommended to run this script under the SYSTEM context.
 
-    DO NOT GIVE USERS WRITE ACCESS TO THIS FILE. LOCK IT DOWN !
+    DO NOT GIVE USERS WRITE ACCESS TO THIS FILE. LOCK IT DOWN !  Do not allow access to the config file as that has the API key for writing to the database.
 
-    Author: Anders Rødland
+    Updated by: Paul Wetter (wetterssource.com)
+    Twitter: @paulwetter
+
+    Original Author: Anders Rødland
     Blog: https://www.andersrodland.com
     Twitter: @AndersRodland
 .LINK
@@ -140,6 +142,14 @@ Begin {
         catch {
             $ExceptionMessage = $_.Exception.Message
             Write-Host "Error Invoking RestMethod $Method on URI $URI. Failed to update database using webservice. Exception: $ExceptionMessage"
+        }
+        $KeyIDValue = Get-RegistryValue -Path $ClientHealthRegistryKey -Name $ClientHealthIdValueName
+        if ([string]::IsNullOrEmpty($KeyIDValue)){
+            if (![string]::IsNullOrEmpty($Response.ClientHealthId) -and $Response.ClientHealthId -ne ([guid]::Empty).Guid.ToString()) {
+                Set-RegistryValue -Path $ClientHealthRegistryKey -Name $ClientHealthIdValueName -Value
+            } else {
+                Write-ChLog -Text "Response from API did not include a ClientHealthID"
+            }
         }
     }
 
@@ -257,7 +267,7 @@ Begin {
         if ((Test-Path -Path $clientpath) -eq $False) { New-Item -Path $clientpath -ItemType Directory -Force | Out-Null }
     }
 
-    Function Out-LogFile {
+    Function Write-ChLog {
         Param([Parameter(Mandatory = $false)]$Text, $Mode,
             [Parameter(Mandatory = $false)][ValidateSet(1, 2, 3, 'Information', 'Warning', 'Error')]$Severity = 1)
 
@@ -602,7 +612,7 @@ Begin {
     Function Test-BITS {
         Param([Parameter(Mandatory=$true)]$Log)
 
-        if ($BitsCheckEnabled -eq $true) {
+        if ($BitsCheckable -eq $true)  {
             $Errors = Get-BitsTransfer -AllUsers | Where-Object { ($_.JobState -like "TransientError") -or ($_.JobState -like "Transient_Error") -or ($_.JobState -like "Error") }
 
             if ($null -ne $Errors) {
@@ -907,15 +917,15 @@ Begin {
                     Write-Host $text
                     $log.DNS = $logFail
                     if (-NOT($FileLogLevel -like "clientlocal")) {
-                        Out-LogFile -Text $text -Severity 2
-                        Out-LogFile -Text $dnsFail -Severity 2
+                        Write-ChLog -Text $text -Severity 2
+                        Write-ChLog -Text $dnsFail -Severity 2
                     }
 
                 }
                 else {
                     $text = 'DNS Check: FAILED. IP address published in DNS do not match IP address on local machine. Monitor mode only, no remediation'
                     $log.DNS = $logFail
-                    if (-NOT($FileLogLevel -like "clientlocal")) { Out-LogFile -Text $text  -Severity 2}
+                    if (-NOT($FileLogLevel -like "clientlocal")) { Write-ChLog -Text $text  -Severity 2}
                     Write-Host $text
                 }
 
@@ -1127,7 +1137,7 @@ Begin {
 
             # Test again if agent is installed
             if (Get-Service -Name ccmexec -ErrorAction SilentlyContinue) {}
-            else { Out-LogFile "ConfigMgr Client installation failed. Agent not detected 10 minutes after triggering installation."  -Mode "ClientInstall" -Severity 3}
+            else { Write-ChLog "ConfigMgr Client installation failed. Agent not detected 10 minutes after triggering installation."  -Mode "ClientInstall" -Severity 3}
         }
     }
 
@@ -1279,7 +1289,7 @@ Begin {
                 Write-Output $text
                 $log.PendingReboot = 'OK'
             }
-            #Out-LogFile -Text $text
+            #Write-ChLog -Text $text
         }
     }
 
@@ -1608,7 +1618,7 @@ Begin {
                 Write-Verbose "returning true to tag client for reinstall"
                 $obj = $true
             }
-            #Out-LogFile -Text $text
+            #Write-ChLog -Text $text
             Write-Output $obj
         }
     }
@@ -1660,13 +1670,13 @@ Begin {
     Function Test-RefreshComplianceState {
         Param(
             $Days=0,
-            [Parameter(Mandatory=$true)]$RegistryKey,
+            [Parameter(Mandatory=$true)]$ClientHealthRegistryKey,
             [Parameter(Mandatory=$true)]$Log
         )
         $RegValueName="RefreshServerComplianceState"
 
         #Get the last time this script was ran.  If the registry isn't found just use the current date.
-        Try { [datetime]$LastSent = Get-RegistryValue -Path $RegistryKey -Name $RegValueName }
+        Try { [datetime]$LastSent = Get-RegistryValue -Path $ClientHealthRegistryKey -Name $RegValueName }
         Catch { [datetime]$LastSent = Get-Date }
 
         Write-Verbose "The compliance states were last sent on $($LastSent)"
@@ -1690,7 +1700,7 @@ Begin {
             Write-Output "Compliance States: OK."
         }
 
-        Set-RegistryValue -Path $RegistryKey -Name $RegValueName -Value $LastSent
+        Set-RegistryValue -Path $ClientHealthRegistryKey -Name $RegValueName -Value $LastSent
         $Log.RefreshComplianceState = Get-SmallDateTime $LastSent
 
 
@@ -2083,7 +2093,7 @@ Begin {
             foreach ($device in $devices) {
                 $text = 'Missing or faulty driver: ' +$device.Name + '. Device ID: ' + $device.DeviceID
                 Write-Warning $text
-                if (-NOT($FileLogLevel -like "clientlocal")) { Out-LogFile -Text $text -Severity 2}
+                if (-NOT($FileLogLevel -like "clientlocal")) { Write-ChLog -Text $text -Severity 2}
             }
         }
         else {
@@ -2278,7 +2288,7 @@ Begin {
     Function Get-Version {
         $text = 'ConfigMgr Client Health Version ' +$Version
         Write-Output $text
-        Out-LogFile -Text $text -Severity 1
+        Write-ChLog -Text $text -Severity 1
     }
 
     <# Trigger codes
@@ -2352,7 +2362,7 @@ Begin {
         catch {
             $text = "Error connecting to SQLDatabase $Database on SQL Server $SQLServer"
             Write-Error -Message $text
-            if (-NOT($FileLogLevel -like "clientinstall")) { Out-LogFile -Text $text -Severity 3}
+            if (-NOT($FileLogLevel -like "clientinstall")) { Write-ChLog -Text $text -Severity 3}
             $obj = $false;
             Write-Verbose "SQL connection test failed"
         }
@@ -2852,28 +2862,28 @@ Begin {
         #$text = 'Computer info'+ "`n"
         $text = 'Hostname: ' +$info.HostName
         Write-Output $text
-        #Out-LogFile  $text
+        #Write-ChLog  $text
         $text = 'Operatingsystem: ' +$info.OperatingSystem
         Write-Output $text
-        #Out-LogFile $text
+        #Write-ChLog $text
         $text = 'Architecture: ' + $info.Architecture
         Write-Output $text
-        #Out-LogFile $text
+        #Write-ChLog $text
         $text = 'Build: ' + $info.Build
         Write-Output $text
-        #Out-LogFile $text
+        #Write-ChLog $text
         $text = 'Manufacturer: ' + $info.Manufacturer
         Write-Output $text
-        #Out-LogFile $text
+        #Write-ChLog $text
         $text = 'Model: ' + $info.Model
         Write-Output $text
-        #Out-LogFile $text
+        #Write-ChLog $text
         $text = 'InstallDate: ' + $info.InstallDate
         Write-Output $text
-        #Out-LogFile $text
+        #Write-ChLog $text
         $text = 'LastLoggedOnUser: ' + $info.LastLoggedOnUser
         Write-Output $text
-        #Out-LogFile $text
+        #Write-ChLog $text
     }
 
     Function Test-ConfigMgrHealthLogging {
@@ -2972,7 +2982,7 @@ Begin {
         $BITS = $null
 		$ClientSettings = $null
 
-        $obj = [pscustomobject]@{
+        $LogObject = [pscustomobject]@{
             clientHealthId = ([guid]::Empty).Guid.ToString()
             Hostname = $Hostname
             Operatingsystem = $OperatingSystem
@@ -3035,7 +3045,7 @@ Begin {
             Extension_018 = $null
             Extension_019 = $null
         }
-        Write-Output $obj
+        return $LogObject
        # Write-Verbose "End New-LogObject"
     }
 
@@ -3126,7 +3136,7 @@ Begin {
             $ErrorMessage = $_.Exception.Message
             $text = "Error updating SQL with the following query: $query. Error: $ErrorMessage"
             Write-Error $text
-            Out-LogFile -Text "ERROR Insert/Update SQL. SQL Query: $query `nSQL Error: $ErrorMessage" -Severity 3
+            Write-ChLog -Text "ERROR Insert/Update SQL. SQL Query: $query `nSQL Error: $ErrorMessage" -Severity 3
         }
         Write-Verbose "End Update-SQL"
     }
@@ -3150,14 +3160,11 @@ Begin {
         $text = $text.replace(" :",":")
         $text = $text -creplace '(?m)^\s*\r?\n',''
 
-        if ($Mode -eq 'Local') { Out-LogFile -Text $text -Mode $Mode -Severity 1}
-        elseif ($Mode -eq 'ClientInstalledFailed') { Out-LogFile -Text $text -Mode $Mode -Severity 1}
-        else { Out-LogFile -Text $text -Severity 1}
+        if ($Mode -eq 'Local') { Write-ChLog -Text $text -Mode $Mode -Severity 1}
+        elseif ($Mode -eq 'ClientInstalledFailed') { Write-ChLog -Text $text -Mode $Mode -Severity 1}
+        else { Write-ChLog -Text $text -Severity 1}
         Write-Verbose "End Update-LogFile"
     }
-
-    # Write-Log : CMTrace compatible log file
-
 
     #endregion
 
@@ -3226,7 +3233,7 @@ Process {
     If (-NOT ([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole] "Administrator"))
     {
         $text = 'ERROR: Powershell not running as Administrator! Client Health aborting.'
-        Out-LogFile -Text $text -Severity 3
+        Write-ChLog -Text $text -Severity 3
         Write-Error $text
         Exit 1
     }
@@ -3260,11 +3267,12 @@ Process {
     $SQLLogging = ((Get-ChConfigSQLLoggingEnable).ToString()).ToLower()
 
 
-    $RegistryKey = "HKLM:\Software\ConfigMgrClientHealth"
+    $ClientHealthRegistryKey = "HKLM:\Software\ConfigMgrClientHealth"
     $LastRunRegistryValueName = "LastRun"
+    $ClientHealthIdValueName = "ClientHealthId"
 
     #Get the last run from the registry, defaulting to the minimum date value if the script has never ran.
-    try{[datetime]$LastRun = Get-RegistryValue -Path $RegistryKey -Name $LastRunRegistryValueName}
+    try{[datetime]$LastRun = Get-RegistryValue -Path $ClientHealthRegistryKey -Name $LastRunRegistryValueName}
     catch{$LastRun=[datetime]::MinValue}
     Write-Output "Script last ran: $($LastRun)"
 
@@ -3300,7 +3308,7 @@ Process {
         $RefreshComplianceStateDays = Get-ChConfigRefreshComplianceStateDays
 
         Write-Verbose "Checking if compliance state should be resent after $($RefreshComplianceStateDays) days."
-        Test-RefreshComplianceState -Days $RefreshComplianceStateDays -RegistryKey $RegistryKey  -log $Log
+        Test-RefreshComplianceState -Days $RefreshComplianceStateDays -RegistryKey $ClientHealthRegistryKey  -log $Log
     }
 
     Write-Verbose 'Testing if ConfigMgr client is installed. Installing if not.'
@@ -3486,7 +3494,7 @@ End {
 
     #Set the last run.
     $Date = Get-Date
-    Set-RegistryValue -Path $RegistryKey -Name $LastRunRegistryValueName -Value $Date
+    Set-RegistryValue -Path $ClientHealthRegistryKey -Name $LastRunRegistryValueName -Value $Date
     Write-Output "Setting last ran to $($Date)"
 
     if ($LocalLogging -like 'true') {
