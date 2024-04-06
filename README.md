@@ -1,14 +1,13 @@
 # ConfigMgr Client Health
 
-Version: 2.0.0
+Version: 3.0.0 alpha
+
+__WARNING:__ Not fully functional yet.  Still needs some work.
 
 This is the master branch of ConfigMgr Client Health and is ready for production.
 
-Download the stable version including the webservice: [ConfigMgr Client Health 0.8.3](https://github.com/AndersRodland/ConfigMgrClientHealth/raw/master/Download/ConfigMgrClientHealth-0.8.3.zip)
-
 [ConfigMgr Client Health Full documentation](https://www.andersrodland.com/configmgr-client-health/)
 
-Note: Script version 0.8.3 requires database version 0.7.5.
 
 
 ## Changes since stable release
