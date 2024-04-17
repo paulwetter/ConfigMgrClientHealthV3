@@ -9,6 +9,9 @@ try{
 $header = @{
     'ApiKey' = 'Thisisthekey12345678'
 }
+Invoke-RestMethod -Method Get -Uri 'https://soup-ws1.soup.wetterssource.com/api/Clients/ClientConfiguration' -Headers $header
+$json=Invoke-RestMethod -Method Put -Uri 'https://soup-ws1.soup.wetterssource.com/api/Clients/Client' -Headers $header -Body $NewClient -ContentType 'application/json'
+
 
 $json=Invoke-RestMethod -Method Get -Uri 'http://testdb/api/Clients/Client?name=6e1853d0-8d83-4c6e-89d0-e2ea2c829ad7' -Headers $header
 $json=Invoke-RestMethod -Method Get -Uri 'http://testdb/api/Clients/ClientConfiguration' -Headers $header
@@ -115,16 +118,28 @@ $config = @'
     "Log": [
         {
             "Name": "File",
-            "Share": "\\\\MEMCM01.andersrodland.com\\ClientHealthLogs$",
-            "Level": "Full",
-            "MaxLogHistory": "8",
-            "LocalLogFile": "True",
+            "Value": "\\\\MEMCM01.andersrodland.com\\ClientHealthLogs$",
+            "Enable": "True" 
+        },
+        {
+            "Name": "FileLevel",
+            "Value": "Full",
+            "Enable": "True" 
+        },
+        {
+            "Name": "FileMaxLogHistory",
+            "Value": "8",
+            "Enable": "True" 
+        },
+        {
+            "Name": "LocalLogFile",
+            "Value": "",
             "Enable": "True" 
         },
         {
             "Name": "SQL",
             "Value": "MEMCM01.andersrodland.com",
-            "Enable": "True"
+            "Enable": "False"
         },
         {
             "Name": "Time",
@@ -408,3 +423,289 @@ $NewClient = @'
     "extension_019": ""
 }
 '@
+
+
+
+('{"webService":[{"name":"URI","value":"https://localhost:7107","enable":"true"},{"name":"ApiKey","value":"Thisisthekey12345678","enable":"true"},{"name":"UseApiConfig","value":"","enable":"true"}],"LocalFiles":{"_comment":"Path locally on computer for temporary files and local clienthealth.log if LocalLogFile=\"True\"","Value":"C:\\ClientHealth"},"Client":[{"Name":"Version","Value":"5.00.9012.1010","Enable":null},{"Name":"SiteCode","Value":"AR1","Enable":null},{"Name":"Domain","Value":"andersrodland.com","Enable":null},{"Name":"AutoUpgrade","Value":"True","Enable":null},{"Name":"Share","Value":"\\\\MEMCM01.andersrodland.com\\Clienthealth$\\Client","Enable":null},{"Name":"CacheSize","Value":"16384","Enable":null},{"Name":"CacheSizeEnable","Value":"True","Enable":null},{"Name":"DeleteOrphanedData","Value":"True","Enable":null},{"Name":"MaxLogSize","Value":"4096","Enable":null},{"Name":"MaxLogHistory","Value":"2","Enable":null},{"Name":"MaxLogEnabled","Value":"True","Enable":null}],"ClientInstallProperty":["SMSSITECODE=AR1","MP=MEMCM01.andersrodland.com","FSP=MEMCM01.andersrodland.com","DNSSUFFIX=andersrodland.com","/Source:\\\\MEMCM01.andersrodland.com\\Clienthealth$\\client","/MP:MEMCM01.andersrodland.com","/skipprereq:silverlight.exe"],"Log":[{"Name":"File","Share":"\\\\MEMCM01.andersrodland.com\\ClientHealthLogs$","Level":"Full","MaxLogHistory":"8","LocalLogFile":"True","Enable":"True","Value":null,"Comment":"Valid time formats: ClientLocal / UTC"},{"Name":"SQL","Share":null,"Level":null,"MaxLogHistory":null,"LocalLogFile":null,"Enable":"True","Value":"MEMCM01.andersrodland.com","Comment":"Valid time formats: ClientLocal / UTC"},{"Name":"Time","Share":null,"Level":null,"MaxLogHistory":null,"LocalLogFile":null,"Enable":null,"Value":"ClientLocal","Comment":"Valid time formats: ClientLocal / UTC"}],"Option":[{"Name":"CcmSQLCELog","Enable":"False","Fix":null,"Value":null,"Days":null,"Share":null},{"Name":"BITSCheck","Enable":"True","Fix":"True","Value":null,"Days":null,"Share":null},{"Name":"ClientSettingsCheck","Enable":"True","Fix":"True","Value":null,"Days":null,"Share":null},{"Name":"DNSCheck","Enable":"True","Fix":"True","Value":null,"Days":null,"Share":null},{"Name":"Drivers","Enable":"True","Fix":null,"Value":null,"Days":null,"Share":null},{"Name":"Updates","Enable":"False","Fix":"True","Value":null,"Days":null,"Share":"\\\\MEMCM01.andersrodland.com\\ClientHealth$\\Updates"},{"Name":"PendingReboot","Enable":"True","Fix":"False","Value":null,"Days":null,"Share":null},{"Name":"RebootApplication","Enable":"False","Fix":null,"Value":"\\\\MEMCM01.andersrodland.com\\ClientHealth$\\RebootApp\\shutdowntool.exe /t:7200 /m:1440","Days":null,"Share":null},{"Name":"MaxRebootDays","Enable":"True","Fix":null,"Value":null,"Days":"7","Share":null},{"Name":"OSDiskFreeSpace","Enable":null,"Fix":null,"Value":"10","Days":null,"Share":null},{"Name":"HardwareInventory","Enable":"True","Fix":"True","Value":null,"Days":"10","Share":null},{"Name":"SoftwareMetering","Enable":"True","Fix":"True","Value":null,"Days":null,"Share":null},{"Name":"WMI","Enable":"True","Fix":"True","Value":null,"Days":null,"Share":null},{"Name":"RefreshComplianceState","Enable":"True","Fix":null,"Value":null,"Days":"30","Share":null}],"Service":[{"Name":"BITS","StartupType":"Automatic (Delayed Start)","State":"Running","Uptime":""},{"Name":"winmgmt","StartupType":"Automatic","State":"Running","Uptime":""},{"Name":"wuauserv","StartupType":"Automatic (Delayed Start)","State":"Running","Uptime":""},{"Name":"lanmanserver","StartupType":"Automatic","State":"Running","Uptime":""},{"Name":"RpcSs","StartupType":"Automatic","State":"Running","Uptime":""},{"Name":"W32Time","StartupType":"Automatic","State":"Running","Uptime":""},{"Name":"ccmexec","StartupType":"Automatic (Delayed Start)","State":"Running","Uptime":""}],"Remediation":[{"Name":"AdminShare","Fix":"True","Days":null},{"Name":"ClientProvisioningMode","Fix":"True","Days":null},{"Name":"ClientStateMessages","Fix":"True","Days":null},{"Name":"ClientWUAHandler","Fix":"True","Days":"30"},{"Name":"ClientCertificate","Fix":"True","Days":null}]}'|ConvertFrom-Json).webService
+
+
+
+
+@'
+{
+    "webService":  [
+                       {
+                           "name":  "URI",
+                           "value":  "https://localhost:7107",
+                           "enable":  "true"
+                       },
+                       {
+                           "name":  "ApiKey",
+                           "value":  "Thisisthekey12345678",
+                           "enable":  "true"
+                       },
+                       {
+                           "name":  "UseApiConfig",
+                           "value":  "",
+                           "enable":  "true"
+                       }
+                   ],
+    "localFiles":  {
+                       "comment":  "Path locally on computer for temporary files and local clienthealth.log if LocalLogFile=\"True\"",
+                       "value":  "C:\\ClientHealth"
+                   },
+    "client":  [
+                   {
+                       "name":  "InstallEnabled",
+                       "value":  "False"
+                   },
+                   {
+                       "name":  "Version",
+                       "value":  "5.00.9012.1010"
+                   },
+                   {
+                       "name":  "SiteCode",
+                       "value":  "AR1"
+                   },
+                   {
+                       "name":  "Domain",
+                       "value":  "andersrodland.com"
+                   },
+                   {
+                       "name":  "AutoUpgrade",
+                       "value":  "False"
+                   },
+                   {
+                       "name":  "Share",
+                       "value":  "\\\\MEMCM01.andersrodland.com\\Clienthealth$\\Client"
+                   },
+                   {
+                       "name":  "CacheSize",
+                       "value":  "16384"
+                   },
+                   {
+                       "name":  "CacheSizeEnable",
+                       "value":  "True"
+                   },
+                   {
+                       "name":  "DeleteOrphanedData",
+                       "value":  "True"
+                   },
+                   {
+                       "name":  "MaxLogSize",
+                       "value":  "4096"
+                   },
+                   {
+                       "name":  "MaxLogHistory",
+                       "value":  "2"
+                   },
+                   {
+                       "name":  "MaxLogEnabled",
+                       "value":  "True"
+                   }
+               ],
+    "clientInstallProperty":  [
+                                  "SMSSITECODE=AR1",
+                                  "MP=MEMCM01.andersrodland.com",
+                                  "FSP=MEMCM01.andersrodland.com",
+                                  "DNSSUFFIX=andersrodland.com",
+                                  "/Source:\\\\MEMCM01.andersrodland.com\\Clienthealth$\\client",
+                                  "/MP:MEMCM01.andersrodland.com",
+                                  "/skipprereq:silverlight.exe"
+                              ],
+    "Log": [
+        {
+            "Name": "RemoteFile",
+            "Value": "\\\\MEMCM01.andersrodland.com\\ClientHealthLogs$",
+            "Enable": "False",
+            "comment": ""
+        },
+        {
+            "Name": "FileLevel",
+            "Value": "Full",
+            "Enable": "True",
+            "comment": ""
+        },
+        {
+            "Name": "FileMaxLogHistory",
+            "Value": "8",
+            "Enable": "True",
+            "comment": ""
+        },
+        {
+            "Name": "LocalLogFile",
+            "Value": "",
+            "Enable": "True",
+            "comment": ""
+        },
+        {
+            "Name": "SQL",
+            "Value": "MEMCM01.andersrodland.com",
+            "Enable": "False",
+            "comment": ""
+        },
+        {
+            "Name": "Time",
+            "Value": "ClientLocal",
+            "comment": "Valid time formats: ClientLocal / UTC"
+        }
+    ],
+    "option":  [
+                   {
+                       "name":  "CcmSQLCELog",
+                       "enable":  "False",
+                       "fix":  null,
+                       "value":  null
+                   },
+                   {
+                       "name":  "BITSCheck",
+                       "enable":  "True",
+                       "fix":  "True",
+                       "value":  null
+                   },
+                   {
+                       "name":  "ClientSettingsCheck",
+                       "enable":  "True",
+                       "fix":  "True",
+                       "value":  null
+                   },
+                   {
+                       "name":  "DNSCheck",
+                       "enable":  "True",
+                       "fix":  "True",
+                       "value":  null
+                   },
+                   {
+                       "name":  "Drivers",
+                       "enable":  "True",
+                       "fix":  null,
+                       "value":  null
+                   },
+                   {
+                       "name":  "Updates",
+                       "enable":  "False",
+                       "fix":  "True",
+                       "value":  "\\\\MEMCM01.andersrodland.com\\ClientHealth$\\Updates"
+                   },
+                   {
+                       "name":  "PendingReboot",
+                       "enable":  "True",
+                       "fix":  "False",
+                       "value":  null
+                   },
+                   {
+                       "name":  "RebootApplication",
+                       "enable":  "False",
+                       "fix":  null,
+                       "value":  "\\\\MEMCM01.andersrodland.com\\ClientHealth$\\RebootApp\\shutdowntool.exe /t:7200 /m:1440"
+                   },
+                   {
+                       "name":  "MaxRebootDays",
+                       "enable":  "True",
+                       "fix":  null,
+                       "value": "7"
+                   },
+                   {
+                       "name":  "OSDiskFreeSpace",
+                       "enable":  null,
+                       "fix":  null,
+                       "value":  "10"
+                   },
+                   {
+                       "name":  "HardwareInventory",
+                       "enable":  "True",
+                       "fix":  "True",
+                       "value":  "10"
+                   },
+                   {
+                       "name":  "SoftwareMetering",
+                       "enable":  "True",
+                       "fix":  "True",
+                       "value":  null
+                   },
+                   {
+                       "name":  "WMI",
+                       "enable":  "True",
+                       "fix":  "True",
+                       "value":  null
+                   },
+                   {
+                       "name":  "RefreshComplianceState",
+                       "enable":  "True",
+                       "fix":  null,
+                       "value":  "30"
+                   }
+               ],
+    "service":  [
+                    {
+                        "name":  "BITS",
+                        "startupType":  "Automatic (Delayed Start)",
+                        "state":  "Running",
+                        "uptime":  ""
+                    },
+                    {
+                        "name":  "winmgmt",
+                        "startupType":  "Automatic",
+                        "state":  "Running",
+                        "uptime":  ""
+                    },
+                    {
+                        "name":  "wuauserv",
+                        "startupType":  "Automatic (Delayed Start)",
+                        "state":  "Running",
+                        "uptime":  ""
+                    },
+                    {
+                        "name":  "lanmanserver",
+                        "startupType":  "Automatic",
+                        "state":  "Running",
+                        "uptime":  ""
+                    },
+                    {
+                        "name":  "RpcSs",
+                        "startupType":  "Automatic",
+                        "state":  "Running",
+                        "uptime":  ""
+                    },
+                    {
+                        "name":  "W32Time",
+                        "startupType":  "Automatic",
+                        "state":  "Running",
+                        "uptime":  ""
+                    },
+                    {
+                        "name":  "ccmexec",
+                        "startupType":  "Automatic (Delayed Start)",
+                        "state":  "Running",
+                        "uptime":  ""
+                    }
+                ],
+    "remediation":  [
+                        {
+                            "name":  "AdminShare",
+                            "fix":  "True",
+                            "days":  null
+                        },
+                        {
+                            "name":  "ClientProvisioningMode",
+                            "fix":  "True",
+                            "days":  null
+                        },
+                        {
+                            "name":  "ClientStateMessages",
+                            "fix":  "True",
+                            "days":  null
+                        },
+                        {
+                            "name":  "ClientWUAHandler",
+                            "fix":  "True",
+                            "days":  "30"
+                        },
+                        {
+                            "name":  "ClientCertificate",
+                            "fix":  "True",
+                            "days":  null
+                        }
+                    ]
+}
+'@|ConvertFrom-Json|ConvertTo-Json -Compress|clip
