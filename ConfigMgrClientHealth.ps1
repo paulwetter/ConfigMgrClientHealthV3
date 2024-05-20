@@ -990,7 +990,7 @@ Begin {
     Function Test-ConfigMgrClient {
         $ClientStatus = [PSCustomObject]@{
             ClientInstalledReason = ""
-            ClientInstalled = [datetime]::MinValue
+            ClientInstalled = $null
         }
 
         $installenabled = Get-ChConfigClientInstallEnabled
@@ -2845,67 +2845,67 @@ Begin {
 
     class ClientHealthLog {
         [string]$clientHealthId = ([guid]::Empty).Guid.ToString()
-        [string]$Hostname
-        [string]$Operatingsystem
-        [string]$Architecture
-        [string]$Build
-        [string]$Manufacturer
-        [string]$Model
-        [string]$InstallDate
-        [string]$OSUpdates = $null
-        [string]$LastLoggedOnUser
-        [string]$ClientVersion = 'Unknown'
-        [double]$PSVersion
-        [int]$PSBuild
-        [string]$Sitecode
-        [string]$Domain
-        [int]$MaxLogSize = 0
-        [int]$MaxLogHistory = 0
-        [int]$CacheSize
-        [string]$ClientCertificate = 'Unknown'
-        [string]$ProvisioningMode = 'Unknown'
-        [string]$DNS = 'Unknown'
-        [string]$Drivers = 'Unknown'
-        [string]$Updates = 'Unknown'
-        [string]$PendingReboot = 'Unknown'
-        [string]$LastBootTime
-        [double]$OSDiskFreeSpace
-        [string]$Services = 'Unknown'
-        [string]$AdminShare = 'Unknown'
-        [string]$StateMessages = 'Unknown'
-        [string]$WUAHandler = 'Unknown'
-        [string]$WMI = 'Unknown'
-        [string]$RefreshComplianceState
-        [string]$ClientInstalled = $null
-        [string]$Version
-        [string]$Timestamp
-        [string]$HWInventory = $null
-        [string]$SWMetering = $null
-        [string]$ClientSettings = $null
-        [string]$BITS = $null
-        [int]$PatchLevel
-        [string]$ClientInstalledReason = $null
-        [string]$RebootApp = 'Unknown'
-        [string]$Extension_000 = $null
-        [string]$Extension_001 = $null
-        [string]$Extension_002 = $null
-        [string]$Extension_003 = $null
-        [string]$Extension_004 = $null
-        [string]$Extension_005 = $null
-        [string]$Extension_006 = $null
-        [string]$Extension_007 = $null
-        [string]$Extension_008 = $null
-        [string]$Extension_009 = $null
-        [string]$Extension_010 = $null
-        [string]$Extension_011 = $null
-        [string]$Extension_012 = $null
-        [string]$Extension_013 = $null
-        [string]$Extension_014 = $null
-        [string]$Extension_015 = $null
-        [string]$Extension_016 = $null
-        [string]$Extension_017 = $null
-        [string]$Extension_018 = $null
-        [string]$Extension_019 = $null
+        [string]$hostname
+        [string]$operatingSystem
+        [string]$architecture
+        [string]$build
+        [string]$manufacturer
+        [string]$model
+        [string]$installDate
+        [string]$osUpdates = $null
+        [string]$lastLoggedOnUser
+        [string]$clientVersion = 'Unknown'
+        [double]$psVersion
+        [int]$psBuild
+        [string]$sitecode
+        [string]$domain
+        [int]$maxLogSize = 0
+        [int]$maxLogHistory = 0
+        [int]$cacheSize
+        [string]$clientCertificate = 'Unknown'
+        [string]$provisioningMode = 'Unknown'
+        [string]$dns = 'Unknown'
+        [string]$drivers = 'Unknown'
+        [string]$updates = 'Unknown'
+        [string]$pendingReboot = 'Unknown'
+        [string]$lastBootTime
+        [double]$osDiskFreeSpace
+        [string]$services = 'Unknown'
+        [string]$adminShare = 'Unknown'
+        [string]$stateMessages = 'Unknown'
+        [string]$wuaHandler = 'Unknown'
+        [string]$wmi = 'Unknown'
+        [string]$refreshComplianceState
+        [string]$clientInstalled = $null
+        [string]$version
+        [string]$timestamp
+        [string]$hwInventory = $null
+        [string]$swMetering = $null
+##        [string]$clientSettings = $null
+        [string]$bits = $null
+        [int]$patchLevel
+        [string]$clientInstalledReason = $null
+##        [string]$rebootApp = 'Unknown'
+        [string]$extension_000 = $null
+        [string]$extension_001 = $null
+        [string]$extension_002 = $null
+        [string]$extension_003 = $null
+        [string]$extension_004 = $null
+        [string]$extension_005 = $null
+        [string]$extension_006 = $null
+        [string]$extension_007 = $null
+        [string]$extension_008 = $null
+        [string]$extension_009 = $null
+        [string]$extension_010 = $null
+        [string]$extension_011 = $null
+        [string]$extension_012 = $null
+        [string]$extension_013 = $null
+        [string]$extension_014 = $null
+        [string]$extension_015 = $null
+        [string]$extension_016 = $null
+        [string]$extension_017 = $null
+        [string]$extension_018 = $null
+        [string]$extension_019 = $null
     
         ClientHealthLog([datetime]$startDate, $PSVer, $ScriptVersion){
             $OS = Get-CimInstance -class Win32_OperatingSystem
@@ -3311,7 +3311,7 @@ Process {
 
     Write-Verbose 'Validating ClientSettings'
 	If (Get-ChConfigClientSettingsCheck -like 'True') {
-        $log.ClientSettings = Test-ClientSettingsConfiguration
+        #$log.ClientSettings = Test-ClientSettingsConfiguration
 	}
 
     Write-Verbose 'Validating Admin$ and C$ are shared...'
@@ -3372,7 +3372,7 @@ Process {
     Write-Verbose 'Validating pending reboot...'
     $PendingReboot = Test-PendingReboot
     $log.PendingReboot = $PendingReboot.Message
-    $log.RebootApp = $PendingReboot.AppStartTime
+    #$log.RebootApp = $PendingReboot.AppStartTime
 
     Write-Verbose 'if endabled, Getting last reboot time and rebooting if needed.'
     Invoke-RebootIfNeeded #this doesn't log anywhere
