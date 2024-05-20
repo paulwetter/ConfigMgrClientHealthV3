@@ -19,7 +19,7 @@ GO
 IF NOT EXISTS (SELECT [name] FROM sys.tables WHERE [name] = 'Configuration')
 CREATE TABLE dbo.Configuration
 (
-    Name varchar(50) NOT NULL UNIQUE,
+    Name varchar(MAX) NOT NULL UNIQUE,
     Version varchar (10) NOT NULL
 )
 
@@ -28,7 +28,7 @@ GO
 IF NOT EXISTS (SELECT [name] FROM sys.tables WHERE [name] = 'ClientConfiguration')
 CREATE TABLE dbo.ClientConfiguration
 (
-    Id varchar(100) NOT NULL PRIMARY KEY,
+    Id varchar(MAX) NOT NULL PRIMARY KEY,
     Configuration varchar(max) NOT NULL
 )
 
@@ -37,43 +37,43 @@ IF NOT EXISTS (SELECT [name] FROM sys.tables WHERE [name] = 'Clients')
 CREATE TABLE dbo.Clients
 (
     ClientHealthId varchar(36) NOT NULL PRIMARY KEY,
-    Hostname varchar(100) NOT NULL,
-    OperatingSystem varchar (100) NOT NULL,
+    Hostname varchar(MAX) NOT NULL,
+    OperatingSystem varchar(MAX) NOT NULL,
     Architecture varchar(10) NOT NULL,
-    Build varchar(50) NOT NULL,
-    Manufacturer varchar(50),
-    Model varchar(50),
+    Build varchar(MAX) NOT NULL,
+    Manufacturer varchar(MAX),
+    Model varchar(MAX),
     InstallDate smalldatetime,
     OSUpdates smalldatetime,
-    LastLoggedOnUser varchar(50),
+    LastLoggedOnUser varchar(MAX),
     ClientVersion varchar(20),
     PSVersion float,
     PSBuild int,
     Sitecode varchar(3),
-    Domain varchar(100),
+    Domain varchar(MAX),
     MaxLogSize int,
     MaxLogHistory int,
     CacheSize int,
-    ClientCertificate varchar(50),
-    ProvisioningMode varchar(50),
-    DNS varchar(100),
+    ClientCertificate varchar(MAX),
+    ProvisioningMode varchar(MAX),
+    DNS varchar(MAX),
     Drivers varchar(max),
-    Updates varchar(100),
-    PendingReboot varchar(50),
+    Updates varchar(MAX),
+    PendingReboot varchar(MAX),
     LastBootTime smalldatetime,
     OSDiskFreeSpace float,
     Services varchar(max),
-    AdminShare varchar(256),
-    StateMessages varchar(50),
-    WUAHandler varchar(50),
-    WMI varchar(50),
+    AdminShare varchar(MAX),
+    StateMessages varchar(MAX),
+    WUAHandler varchar(MAX),
+    WMI varchar(MAX),
     RefreshComplianceState smalldatetime,
     ClientInstalled smalldatetime,
     Version varchar(10),
     Timestamp datetime,
     HWInventory smalldatetime,
-    SWMetering varchar(50),
-    BITS varchar(50),
+    SWMetering varchar(MAX),
+    BITS varchar(MAX),
     PatchLevel int,
     ClientInstalledReason varchar(max),
     Extension_000 varchar(max),
@@ -105,7 +105,7 @@ CREATE TABLE dbo.Clients
 
 
 -- Modify columns if needed
---IF NOT EXISTS (SELECT * FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = 'dbo' AND TABLE_NAME = 'Clients' AND COLUMN_NAME = 'Hostname' AND DATA_TYPE = 'varchar' AND CHARACTER_MAXIMUM_LENGTH = 100) ALTER TABLE dbo.Clients ALTER COLUMN Hostname VARCHAR(100) NOT NULL
+--IF NOT EXISTS (SELECT * FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = 'dbo' AND TABLE_NAME = 'Clients' AND COLUMN_NAME = 'Hostname' AND DATA_TYPE = 'varchar' AND CHARACTER_MAXIMUM_LENGTH = 100) ALTER TABLE dbo.Clients ALTER COLUMN Hostname varchar(MAX) NOT NULL
 
 -- Set latest ConfigMgr Client Health database version:
 GO
