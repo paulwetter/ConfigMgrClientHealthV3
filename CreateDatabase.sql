@@ -19,7 +19,7 @@ GO
 IF NOT EXISTS (SELECT [name] FROM sys.tables WHERE [name] = 'Configuration')
 CREATE TABLE dbo.Configuration
 (
-    Name varchar(MAX) NOT NULL UNIQUE,
+    Name varchar(50) NOT NULL UNIQUE,
     Version varchar (10) NOT NULL
 )
 
@@ -28,7 +28,7 @@ GO
 IF NOT EXISTS (SELECT [name] FROM sys.tables WHERE [name] = 'ClientConfiguration')
 CREATE TABLE dbo.ClientConfiguration
 (
-    Id varchar(MAX) NOT NULL PRIMARY KEY,
+    Id varchar(100) NOT NULL PRIMARY KEY,
     Configuration varchar(max) NOT NULL
 )
 
