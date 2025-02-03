@@ -6,7 +6,7 @@ __WARNING:__ Not fully functional yet.  Still needs some work.
 
 Verision 3 of the API uses entity framework to build the database.  The api is built on .net 8.  The api can serve the configuration for the client as well through the endpoint.
 
-## API Endpoints:
+## API Endpoints
 
 ### Get
 
@@ -36,11 +36,11 @@ Verision 3 of the API uses entity framework to build the database.  The api is b
 1. Restart the website.
 1. Review log file.  It should have applied migrations.
 1. Check the database.  It should now contain a `Clients` and `ClientConfiguration` table.
-1. Browse to https://server.domain.com:7107/swagger.  Adjust this url to your iis server and port.
+1. Browse to [https://server.domain.com:7107/swagger](https://server.domain.com:7107/swagger).  Adjust this url to your iis server and port.
 
 ### API Configuration
 
-1. Browse to https://server.domain.com:7107/swagger.
+1. Browse to [https://server.domain.com:7107/swagger](https://server.domain.com:7107/swagger).
 1. Take a copy of the [config.json](./config.json).
 1. Make your adjustments to the configuration.
 1. On the Swagger page, open the `/api/Clients/ClientConfiguration` __PUT__ endpoint.
@@ -66,7 +66,6 @@ C:\ProgramData\ClientHealth\ConfigMgrClientHealth.ps1 -Config C:\ProgramData\Cli
 
 The above are the basics of the v3.  the V3 client health script when configured to get the config from the API will be able to update the config from the API.
 
-
 ## Original Change log from 2.x
 
 [ConfigMgr Client Health Full documentation](https://www.andersrodland.com/configmgr-client-health/)
@@ -78,6 +77,5 @@ The above are the basics of the v3.  the V3 client health script when configured
 * Fixed an issue where ClientInstallProperty using /skipprereq and specifying multiple components while separating with ";" would break the script.
 * Updated criteria for excluding Defender signature updates in the Get-LastInstalledPatches function. Thanks to Scott Ladewig.
 * Enabled debug logging in the webservice by default to make troubleshooting easier. Debug logs are stored in the "logs" folder.
-
 
 This software is provided "AS IS" with no warranties. Use at your own risk.
