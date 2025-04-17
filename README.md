@@ -30,6 +30,7 @@ Verision 3 of the API uses entity framework to build the database.  The api is b
 1. Extract the files from the zip onto the root of the new IIS website.
 1. Once Extracted, open `appsettings.json` in your favorite text editor.
    * On line 3, update the `DefaultConnection` string with your database name and a username and password.
+     * Note, if you want to use integrated authentication with SQL and change your app pool to run with windows domain credentials, your connection string would look more like this: `Server=ServerName;Database=ClientHealth;Trusted_Connection=True;MultiSubnetFailover=True;TrustServerCertificate=true;`
    * At the end of the file, set the `EnableSwagger` line to `true`.
    * Note the `ClientApiKeys`.  Update the key to a password/secret you will use for reading configurations and writing the client health to the database.
    * Note the `ConfigurationApiKeys`.  Update the key to a password/secret you will use for writing configurations to the database.  This should be kept more secret than the `ClientApiKeys` as the configuration key will only be used to write the client configuration. (I'll probably eventually write a powershell script to use the endpoint to modify the configuration more easily.)
